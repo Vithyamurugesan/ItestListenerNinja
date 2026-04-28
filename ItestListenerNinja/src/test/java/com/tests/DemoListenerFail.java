@@ -2,44 +2,48 @@ package com.tests;
 
 import java.io.File;
 import java.io.IOException;
+
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+
 import org.testng.ITestListener;
 import org.testng.ITestResult;
-public class DemoListenerFail implements ITestListener{
 
+public class DemoListenerFail implements ITestListener {
 
-	    public void onTestStart(ITestResult result) {
-	        System.out.println(result.getName() + " test started");
-	    }
+    public void onTestStart(ITestResult result) {
+        System.out.println(result.getName() + " test started");
+    }
 
-	    public void onTestSuccess(ITestResult result) {
-	        System.out.println("Test PASSED: " + result.getName());
-	    }
+    public void onTestSuccess(ITestResult result) {
+        System.out.println("Test PASSED: " + result.getName());
+    }
 
-	    public void onTestFailure(ITestResult result) {
-	        System.out.println("Test FAILED: " + result.getName());
+    public void onTestFailure(ITestResult result) {
+        System.out.println("Test FAILED: " + result.getName());
 
-	        Object testClass = result.getInstance();
-	        WebDriver driver = ((DemoTest) testClass).driver;
+        Object testClass = result.getInstance();
+        WebDriver driver = ((DemoTest) testClass).driver;
 
-	        TakesScreenshot ts = (TakesScreenshot) driver;
-	        File source = ts.getScreenshotAs(OutputType.FILE);
+        TakesScreenshot ts = (TakesScreenshot) driver;
+        File source = ts.getScreenshotAs(OutputType.FILE);
 
-	        String path = System.getProperty("user.dir") + "/screenshots/" 
-	                + result.getName() + "_" + System.currentTimeMillis() + ".png";
+        String dirPath = System.getProperty("user.dir") + "/screenshots/";
+        new File(dirPath).mkdirs(); 
 
-	        try {
-	            FileUtils.copyFile(source, new File(path));
-	            System.out.println("Screenshot saved at: " + path);
-	        } catch (IOException e) {
-	            System.out.println("Screenshot failed: " + e.getMessage());
-	        }
-	    }
+        String path = dirPath + result.getName() + "_" + System.currentTimeMillis() + ".png";
 
-	    public void onTestSkipped(ITestResult result) {
-	        System.out.println("Test SKIPPED: " + result.getName());
-	    }
-	}
+        try {
+            FileUtils.copyFile(source, new File(path));
+            System.out.println("Screenshot saved at: " + path);
+        } catch (IOException e) {
+            System.out.println("Screenshot failed: " + e.getMessage());
+        }
+    }
+
+    public void onTestSkipped(ITestResult result) {
+        System.out.println("Test SKIPPED: " + result.getName());
+    }
+}

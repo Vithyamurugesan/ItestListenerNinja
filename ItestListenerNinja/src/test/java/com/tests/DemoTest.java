@@ -2,9 +2,15 @@ package com.tests;
 
 import org.testng.annotations.Test;
 import java.time.Duration;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -17,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 public class DemoTest {
 
     public WebDriver driver;
-
+    public WebDriverWait wait;
 
     private static final Logger log = LogManager.getLogger(DemoTest.class);
 
@@ -29,8 +35,9 @@ public class DemoTest {
         log.info("Maximizing window");
         driver.manage().window().maximize();
 
-        log.info("Setting implicit wait");
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        log.info("Setting waits");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
         log.info("Opening application URL");
         driver.get("https://tutorialsninja.com/demo/index.php");
@@ -38,23 +45,50 @@ public class DemoTest {
 
     @Test
     public void loginTest() {
+
         log.info("Clicking My Account");
-        driver.findElement(By.xpath("//span[normalize-space()='My Account']")).click();
+
+        WebElement myAccount = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.xpath("//span[normalize-space()='My Account']")
+                )
+        );
+        myAccount.click();
 
         log.info("Clicking Login");
-        driver.findElement(By.xpath("//a[normalize-space()='Login']")).click();
+
+        WebElement login = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.xpath("//a[normalize-space()='Login']")
+                )
+        );
+        login.click();
 
         log.info("Entering email");
-        driver.findElement(By.id("input-email")).sendKeys("jennysenthil123@gmail.com");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("input-email")))
+                .sendKeys("jennysenthil123@gmail.com");
 
         log.info("Entering password");
         driver.findElement(By.id("input-password")).sendKeys("jenny");
 
         log.info("Clicking Login button");
-        driver.findElement(By.xpath("//input[@value='Login']")).click();
+
+        WebElement loginBtn = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.xpath("//input[@value='Login']")
+                )
+        );
+        loginBtn.click();
 
         log.info("Validating login result");
-        Assert.assertTrue(driver.getPageSource().contains("My Account"));
+
+        boolean isPresent = wait.until(
+                ExpectedConditions.presenceOfElementLocated(
+                        By.xpath("//h2[normalize-space()='My Account']")
+                )
+        ).isDisplayed();
+
+        Assert.assertTrue(isPresent);
 
         log.info("Login test completed successfully");
     }
